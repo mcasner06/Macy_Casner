@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macy Casner — Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb: #0e2f24;
+    --pcb-dark: #081d16;
+    --silk: #dcece2;
+    --silk-dim: #93a89c;
+    --copper: #c98d4a;
+    --copper-bright: #e0a95f;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--pcb);
+    background-image:
+      linear-gradient(90deg, rgba(201,141,74,0.10) 1px, transparent 1px),
+      linear-gradient(rgba(201,141,74,0.10) 1px, transparent 1px),
+      radial-gradient(circle, rgba(201,141,74,0.22) 1.6px, transparent 1.8px);
+    background-size: 42px 42px, 42px 42px, 42px 42px;
+    background-position: 0 0, 0 0, 21px 21px;
+    color: var(--silk);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 0 0 80px;
+  }
+
+  .board{
+    width: 100%;
+    max-width: 600px;
+    padding: 0 24px;
+  }
+
+  .rev-tag{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    padding: 28px 0 22px;
+  }
+  .via{
+    width:7px; height:7px;
+    border-radius:50%;
+    background: var(--copper);
+    flex-shrink:0;
+  }
+  .rev-tag .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--silk-dim);
+  }
+  .rev-tag .trace{
+    flex:1;
+    height:1px;
+    background: rgba(220,236,226,0.25);
+  }
+
+  header{
+    padding-bottom: 26px;
+  }
+
+  h1{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: clamp(30px, 7.5vw, 42px);
+    line-height: 1.1;
+    margin: 0 0 8px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  .role{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--copper-bright);
+    margin: 0;
+  }
+
+  .headshot-wrap{
+    margin: 22px 0 4px;
+  }
+
+  .headshot{
+    width: 360px;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--copper);
+    box-shadow: 0 0 0 4px rgba(201,141,74,0.15);
+    display: block;
+  }
+
+  /* trace connector between header and pitch */
+  .connector{
+    position: relative;
+    height: 28px;
+    margin-left: 3px;
+  }
+  .connector::before{
+    content:"";
+    position:absolute;
+    left:0; top:0;
+    width:1px; height:100%;
+    background: rgba(220,236,226,0.3);
+  }
+  .connector .via{ position:absolute; left:-3px; bottom:-4px; }
+
+  .pitch-block{
+    padding: 4px 0 34px 20px;
+    border-left: 1px solid rgba(220,236,226,0.3);
+    margin-left: 3px;
+  }
+
+  .pitch-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--silk-dim);
+    display:block;
+    margin-bottom: 10px;
+  }
+
+  .pitch{
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--silk);
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+
+  .btn{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    padding: 15px 20px;
+    text-decoration:none;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid rgba(220,236,226,0.35);
+    color: var(--silk);
+    background: rgba(220,236,226,0.03);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn:hover{ border-color: var(--copper-bright); background: rgba(201,141,74,0.08); }
+
+  /* via-hole pads at corners, like component footprint pads */
+  .btn::before, .btn::after{
+    content:"";
+    position:absolute;
+    width:5px; height:5px;
+    border-radius:50%;
+    background: var(--copper);
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.85;
+  }
+  .btn::before{ left: -2.5px; }
+  .btn::after{ right: -2.5px; }
+
+  .btn.primary{
+    background: var(--copper);
+    border-color: var(--copper);
+    color: var(--pcb-dark);
+    font-weight: 600;
+  }
+  .btn.primary::before, .btn.primary::after{ background: var(--copper-bright); }
+  .btn.primary:hover{ background: var(--copper-bright); border-color: var(--copper-bright); }
+
+  .btn .code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  .bom{
+    border: 1px solid rgba(220,236,226,0.3);
+  }
+  .bom-head{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(220,236,226,0.3);
+    color: var(--silk-dim);
+    background: rgba(220,236,226,0.04);
+  }
+
+  .bom-row{
+    display:grid;
+    grid-template-columns: 60px 1fr 1.4fr;
+    align-items:center;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(220,236,226,0.15);
+    font-size: 13px;
+  }
+  .bom-row:last-child{ border-bottom:none; }
+
+  .bom-ref{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--copper-bright);
+    font-size: 12px;
+  }
+  .bom-field{
+    color: var(--silk-dim);
+    font-size: 12px;
+  }
+  .bom-value{
+    color: var(--silk);
+  }
+  .bom-value a{ color: var(--silk); }
+
+  .note{
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--silk-dim);
+    text-align:center;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="board">
+
+  <div class="rev-tag">
+    <span class="via"></span>
+    <span class="label">MACY CASNER WEBSITE</span>
+    <span class="trace"></span>
+  </div>
+
+  <header>
+    <h1>MACY CASNER</h1>
+    <p class="role">// ROBOTIC ENGINEERING TECH · PURDUE</p>
+  </header>
+
+  <div class="headshot-wrap">
+    <img src="headshot.JPEG" alt="Macy Casner" class="headshot">
+  </div>
+
+  <div class="connector"><span class="via"></span></div>
+
+  <div class="pitch-block">
+    <span class="pitch-label">ABOUT ME</span>
+    <p class="pitch">
+      Robotic Engineering Technology student at Purdue with a minor in
+      Atmospheric Science. Interested in how robotics and sensing systems
+      intersect with environmental and weather applications. Happy to talk
+      about my coursework, projects, or where I'd fit on your team.
+    </p>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="saveContactBtn">
+      Save my contact
+      <span class="code">↓ .vcf</span>
+    </button>
+
+    <a class="btn" href="https://www.linkedin.com/in/macy-casner-b17959327" target="_blank" rel="noopener">
+      View my LinkedIn
+      <span class="code">↗</span>
+    </a>
+
+    <a class="btn" href="mailto:casner1@purdue.edu">
+      Email me
+      <span class="code">↗</span>
+    </a>
+
+    <!-- If you have a hosted resume PDF, drop the link in href below -->
+    <a class="btn" href="Macy Casner Current Resume.pdf" target="_blank" rel="noopener">
+      Download my resume
+      <span class="code">↓ .pdf</span>
+    </a>
+  </div>
+
+  <div class="bom">
+    <div class="bom-head">BILL OF MATERIALS</div>
+    <div class="bom-row">
+      <span class="bom-ref">U1</span>
+      <span class="bom-field">NAME</span>
+      <span class="bom-value">Macy Casner</span>
+    </div>
+    <div class="bom-row">
+      <span class="bom-ref">U2</span>
+      <span class="bom-field">PROGRAM</span>
+      <span class="bom-value">Robotic Eng. Tech, Purdue</span>
+    </div>
+    <div class="bom-row">
+      <span class="bom-ref">U3</span>
+      <span class="bom-field">PHONE</span>
+      <span class="bom-value">(812) 530-0511</span>
+    </div>
+    <div class="bom-row">
+      <span class="bom-ref">U4</span>
+      <span class="bom-field">EMAIL</span>
+      <span class="bom-value">casner1@purdue.edu</span>
+    </div>
+  </div>
+
+  <p class="note">// tap wand again anytime — page updates live, no chip rewrite needed</p>
+
+</div>
+
+<script>
+  // Generates a .vcf file on the fly and triggers a download.
+  // Edit the fields below with your real info.
+  document.getElementById('saveContactBtn').addEventListener('click', function () {
+    const vcard = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      'N:Casner;Macy',
+      'FN:Macy Casner',
+      'TITLE:Robotic Engineering Technology Student, Purdue University',
+      'TEL;TYPE=CELL:+18125300511',
+      'EMAIL:casner1@purdue.edu',
+      'URL:https://www.linkedin.com/in/macy-casner-b17959327',
+      'NOTE:Great meeting you at the career fair!',
+      'END:VCARD'
+    ].join('\n');
+
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Macy-Casner.vcf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>
